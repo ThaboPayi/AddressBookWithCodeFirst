@@ -1,7 +1,7 @@
 # AddressBookWithCodeFirst
 
 This is an Address Book App. 
-For Demo puposes in development of thid i have used the follwing Technologies : 
+For Demo puposes in development of this app, i have used the follwing Technologies : 
 1. MVC. 
 2. Ajax. 
 3. JSON 
