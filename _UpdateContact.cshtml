@@ -1,0 +1,75 @@
+﻿@model AddressBookWithCodeFirst.Models.ViewModels.EditModalView
+@{
+    ViewBag.Title = "UpdateContact";
+}
+
+<form id="EditViewPartial">
+    <fieldset>
+        @Html.HiddenFor(m => m.ContactID)
+        @*@Html.HiddenFor(m => m.UserId)*@
+        <div class="addwindowheader"><strong>ADD CONTACT</strong></div>
+        <br>
+        <br>
+        <table>
+            <tr>
+                <td>
+                    <div class="form-group" style="color:#ffffff; padding-left:15px">
+                        @Html.LabelFor(model => model.ContactName, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10" style="padding-left:90px; width:260px">
+                            @Html.EditorFor(model => Model.ContactName, new { htmlAttributes = new { id = "txtCnameEdit", @class = "form-control", @Value = "" + Model.ContactName + "" } })
+                        </div>
+                    </div>
+                    <div class="addtdcontactnameerror">
+                        @Html.ValidationMessageFor(model => Model.ContactName, "", new { @class = "text-danger" })
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <td>
+                    <div class="form-group" style="color:#ffffff; padding-left:15px">
+                        @Html.LabelFor(model => model.ContactSurname, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10" style="padding-left:86px; width:260px">
+                            @Html.EditorFor(model => model.ContactSurname, new { htmlAttributes = new { id = "txtCSurnameEdit", @class = "form-control", @Value = "" + Model.ContactSurname + "" } })
+                        </div>
+                    </div>
+                    <div class="addtdcsurnamerror">
+                        @Html.ValidationMessageFor(model => Model.ContactSurname, "", new { @class = "text-danger" })
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table>
+            <tr>
+                <td>
+                    <div class="form-group" style="color:#ffffff; padding-left:15px">
+                        @Html.LabelFor(model => model.ContactEmail, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10" style="padding-left: 92px; width:260px;">
+                            @Html.EditorFor(model => model.ContactEmail, new { htmlAttributes = new { id = "txtCEmailEdit", @class = "form-control", @Value = "" + Model.ContactEmail + "" } })
+                        </div>
+                    </div>
+                    <div class="addtdcemailerror">
+                        @Html.ValidationMessageFor(model => Model.ContactEmail, "", new { @class = "text-danger" })
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <div class="modal-footer" style="text-align:center; padding-left:340px">
+            <table style="text-align:center">
+                <tr>
+                    <td style="width:100px">
+                        <input type="submit" id="btnEditContact" class="btn btn-default" name="addcontact" value="SAVE" style="width:100%; background-color: #004187; color: #ffffff" onclick="SaveEditContact('@Model.ContactID'); return false;" />
+                    </td>
+                    <td style="padding-left:20px; width:110px">
+                        <input type="submit" id="btnCancel" class="btn btn-default" name="cancel" value="CANCEL" style="width:100%; background-color: #004187; color: #ffffff" onclick="CloseEdit()" data-dissmiss="modal" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </fieldset>
+</form>
+

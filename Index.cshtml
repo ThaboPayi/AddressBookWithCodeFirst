@@ -1,0 +1,309 @@
+﻿@model AddressBookWithCodeFirst.Models.ViewModels.ContactDetails
+@{
+    ViewBag.Title = "Index";
+}
+<h2 style="color: #004187; font-weight: bold">ADDRESS BOOK</h2>
+<div class="form-horizontal">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group" style="color:#ffffff; text-align: center; margin-left:30%; padding-bottom:0px">
+        <div class="col-md-10">
+            <table>
+                <tr>
+                    <td style="padding-left:5px">
+                        @Html.EditorFor(model => model.SearchValue, new { htmlAttributes = new { id = "txtSearch", @class = "form-control", placeholder = "enter contact name" } })
+                    </td>
+                    <td>
+                        <span><i class="glyphicon glyphicon-eye-open" style="color:#ffffff; padding-left:5px; width:100%"></i></span>
+                    </td>
+                    <td>
+                        <span><input type="button" id="searchButton" style="width:100%; color:#ffffff; background-color:#004187; color:#ffffff; background-color:#004187;" name="search" value="SEARCH CONTACT" class="btn btn-default" onclick="Search()" /></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="form-group" style="color: #ffffff; padding-top: 0px; padding-bottom: 0px">
+        <div class="col-md-10">
+            <table>
+                <tr>
+                    <td style="padding-left: 5px">
+                        <span><i class="glyphicon glyphicon-plus-sign" style="color: #ffffff; padding-left: 5px; width: 100%"></i></span>
+                    </td>
+                    <td>
+                        @*<span><input type="button" id="addButton" style="width:100%;" name="addnew" value="ADD NEW" class="btn btn-default" data-toggle="modal" data-target="#dialog-Add" data-backdrop="static" data-keyboard="false" /></span>*@
+                        <button id="addContactModal" class="btn btn-default" style="width: 100%; color: #ffffff; background-color: #004187; border: none" onclick="CallModal();return false;">Create Contact</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+@if (Model.ContactItems.Any())
+{
+    <div style="padding-top:0px" id="table">
+        @Html.Partial("_ContactsList")
+    </div>
+}
+else
+{
+    @Html.Partial("EmptyContactsMessage")
+}
+
+<div id="dialog-Add" class="dialog-Add">
+    @*@Html.HiddenFor(m => m.UserId)*@
+</div>
+<div id="dialog-View" style="display:none; margin-top:5%; background-color:#569bbe;">
+    @*<div id="dialog-Add" class="modal fade" tabindex="-1" title="ADD PROJECT" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="margin-left:35%; margin-top:5%">*@
+</div>
+<div id="dialog-EditView" style="display:none; margin-top:5%; background-color:#569bbe;">
+    @*<div id="dialog-Add" class="modal fade" tabindex="-1" title="ADD PROJECT" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="margin-left:35%; margin-top:5%">*@
+</div>
+
+@section scripts{
+    @if (!string.IsNullOrEmpty(ViewBag.Message))
+    {
+        <script type="text/javascript">
+            $(document).ready(function() {
+                AlertMessage($('.container1'), '@ViewBag.Message');
+            });
+        </script>
+    }
+    <script type="text/javascript">
+        //Start Searching section
+        function Search() {
+
+            var _searchValue = $("#txtSearch").val();
+            //
+            $.ajax({
+                url: "@Url.Content("~/Home/SearchTable")",
+                datatype: "html",
+                data: { searchValue: _searchValue },
+                type: "POST",
+                cache: false,
+                success: function(data) {
+                    $("#table").html(data);
+                },
+                error: function() {
+                    alert("Content load failed.");
+                }
+            });
+        };
+        //End Search section
+        //
+        //Start Modals Section
+        function CallModal() {
+            //add contact modal
+            dialog = $("#dialog-Add").dialog({
+                autoOpen: false,
+                height: 400,
+                width: 880,
+                modal: true,
+                open: function(event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    // Start Ajax
+                    $.ajax({
+                        url: "@Url.Content("~/Home/AddViewPartial")",
+                        datatype: "html",
+                        //data: {},
+                        type: "POST",
+                        //cache: false,
+                        success: function(data) {
+                            $("#dialog-Add").html(data);
+                            //alert(" Items per page updated successfully");
+                        },
+                        error: function (xhr, statusText, err) {
+                            alert("error"+xhr.status);
+                        }
+                    });
+                    //End Ajax
+                }
+            });
+            dialog.dialog("open");
+            form = dialog.find("form").on("submit", function (event) {
+                event.preventDefault();
+                //addUser();
+            });
+        };
+        //END Modals Section
+        //
+        //Start Add Contact Section
+        function AddContact() {
+            //Obtain values
+            //Fields
+            var _Message = "";
+            var cName = $("#txtCname").val();
+            var cSurname = $("#txtCSurname").val();
+            var cEmail = $("#txtCEmail").val();
+
+            //Search
+            var searchValue = $("#txtSearch").val();
+            //Buttons
+            var btnAddContact = $("#btnAddContact").val();
+            var btnCancel = $("#btnCancel").val();
+
+            var errorMessages = "";
+
+            if (cName == false) {
+                //errorMessages += "Please provide Project Name!";
+                alert("Please provide Contact Name!");
+            } else if (cSurname == false) {
+                //errorMessages += "Please provide Client Name!";
+                alert("Please provide Contact Surname!");
+            } else if (cEmail == false) {
+                //errorMessages += "Please provide Project Manager Name!";
+                alert("Please provide Contact email!");
+            } else {
+                //Clear fields
+                $("#txtCname").val("");
+                $("#txtCSurname").val("");
+                $("#txtCEmail").val("");
+                $.ajax({
+                    url: "@Url.Content("~/Home/AddContact")",
+                    datatype: "html",
+                    data: {
+                        btnAddContact: btnAddContact,
+                        btnCancel: btnCancel,
+                        cName: cName,
+                        cSurname: cSurname,
+                        cEmail: cEmail
+                    },
+                    type: "POST",
+                    cache: false,
+                    success: function(data) {
+                        $("#table").html(data);
+                        //_Message = viewBag.Message;
+                        //alert(_Message);
+                        alert("Contact added succesfully");
+                    },
+                    error: function() {
+                        //_Message = viewBag.Message;
+                        //alert(_Message);
+                        alert("Content load failed.");
+                    }
+                });
+                $("#dialog-Add").dialog("close");
+            }
+        };
+        //End Add Contact Section
+        //
+        //Start Cancel Section
+        function Cancel() {
+            $("#txtCname").val("");
+            $("#txtCSurname").val("");
+            $("#txtCEmail").val("");
+            $("#dialog-Add").dialog("close");
+            $("#dialog-View").dialog("close");
+        };
+        function Close() {
+            $("#dialog-View").dialog("close");
+        };
+        function CloseEdit() {
+            $("#dialog-EditView").dialog("close");
+        };
+        //End Cancel section
+        //
+        //Start Call Edit Modal View Section
+        function CallEditModalView(_cID) {
+            var contactId = _cID;
+            dialog = $("#dialog-EditView").dialog({
+                autoOpen: false,
+                height: 400,
+                width: 850,
+                modal: true,
+                open: function (event, ui) {
+                    $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    //Start Ajax
+                    $.ajax({
+                        url: "@Url.Content("~/Home/EditContactView")",
+                        datatype: "html",
+                        data: { contactId: contactId },
+                        type: "POST",
+                        cache: false,
+                        success: function (data) {
+                            $("#dialog-EditView").html(data);
+                            //alert(" Items per page updated successfully");
+                        },
+                        error: function () {
+                            //alert("Content load failed.")
+                        }
+                    });
+                    ////Ajax
+                }
+            });
+
+            dialog.dialog("open");
+            form = dialog.find("form").on("submit", function (event) {
+                event.preventDefault();
+                //addUser();
+            });
+        };
+        //End Call Edit Modal View Section
+        //
+        //Start Save Contact Changes Section
+        function SaveEditContact(_cID) {
+
+            //Obtain values
+            var data = $("#EditViewPartial").serialize();
+            $.ajax({
+                url: "@Url.Content("~/Home/SaveEditContact")",
+                datatype: "html",
+                data:data,
+                type: "POST",
+                cache: false,
+                success: function (data) {
+
+                    if (data.isValid)
+                    {
+                        $("#table").html(data.view);
+                        alert("Changes saved succesfully");
+                        $("#dialog-EditView").dialog("close");
+                    }
+                    else
+                    {
+                        $("#dialog-EditView").html(data.view);
+                    }
+                },
+                error: function () {
+                    //_Message = viewBag.Message;
+                    //alert(_Message);
+                    alert("Content load failed.");
+                }
+            });
+        };
+        //End Save Contact Changes section
+        //
+        //Start Delete Contact Section
+        function DeleteContactDetails(_cID) {
+
+            //var data = $("#table").serialize();
+            var contactId = _cID;
+            $.ajax({
+                url: "@Url.Content("~/Home/DeleteContact")",
+                datatype: "html",
+                data: { contactId: _cID },
+                type: "POST",
+                cache: false,
+                success: function (data) {
+
+                    if (data.isValid)
+                    {
+                        $("#table").html(data.view);
+                        alert("Contact deleted successfully");
+                    }
+                    else
+                    {
+                        $("#table").html(data.view);
+                    }
+                },
+                error: function () {
+                    //_Message = viewBag.Message;
+                    //alert(_Message);
+                    alert("Content load failed.");
+                }
+            });
+        };
+        //End Delete Contact Section
+    </script>
+}
+
+
